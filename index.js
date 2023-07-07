@@ -11,7 +11,12 @@ app.get("/", (req, res) => {
   res.send("Hello, World!");
 });
 
+try {
 wordBot.wordBot()
+} catch (err) {
+    console.log(err);
+    process.exit(1)
+}
 // call()
 
 
