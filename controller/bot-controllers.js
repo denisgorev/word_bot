@@ -12,7 +12,12 @@ const wordBot = () => {
 
 bot.command("allwords", async (ctx) => {
     const text = []
+    try {
     const response = await call()
+    } catch (err) {
+        console.log(err);
+        process.exit(1)
+    }
     const wordArray = response.values
     for (i in wordArray) {
         if (i != 0){
@@ -25,7 +30,6 @@ bot.command("allwords", async (ctx) => {
         
     }
 
-    console.log(text.join("").toString())
     ctx.replyWithHTML(text.join("").toString())
 })
 
