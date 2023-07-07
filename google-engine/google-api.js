@@ -1,9 +1,11 @@
 const call = async () => {
+    const credentials = JSON.parse(process.env.keys);
+    console.log(credentials)
   const { google } = require("googleapis");
   const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
   const auth = new google.auth.GoogleAuth({
-      keyFile: "./etc/secrets/keys.json",
-    // keyFile: process.env.keys,
+    
+    credentials: credentials,
     scopes: SCOPES,
   });
   const authClientObject = await auth.getClient();
