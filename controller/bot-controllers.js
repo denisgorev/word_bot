@@ -4,7 +4,7 @@ const { call } = require("../google-engine/google-api");
 const bot = new Telegraf(process.env.TOKEN);
 
 const wordBot = () => {
-  bot.start(async (ctx) => {
+  bot.start( (ctx) => {
     ctx.replyWithHTML(
       `Привет, ${ctx.from.first_name}! Давай изучать слова!`
     );
