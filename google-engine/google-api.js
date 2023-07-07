@@ -2,7 +2,7 @@ const call = async () => {
   const { google } = require("googleapis");
   const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
   const auth = new google.auth.GoogleAuth({
-      keyFile: "./keys.json",
+      keyFile: "./etc/secrets/keys.json",
     // keyFile: process.env.keys,
     scopes: SCOPES,
   });
