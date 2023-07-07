@@ -17,15 +17,15 @@ const call = async () => {
   } catch (err) {
     console.log(err);
   }
-try {
-  const readData = await googleSheetsInstance.spreadsheets.values.get({
-    auth, //auth object
-    spreadsheetId, // spreadsheet id
-    range: "Words!A:B", //range of cells to read from.
-  });
-} catch (err) {
-    console.log(err)
-}
+  try {
+    const readData = await googleSheetsInstance.spreadsheets.values.get({
+      auth, //auth object
+      spreadsheetId, // spreadsheet id
+      range: "Words!A:B", //range of cells to read from.
+    });
+  } catch (err) {
+    console.log(err);
+  }
 
   // console.log(readData.data);
   return readData.data;
