@@ -2,7 +2,6 @@ const { Telegraf } = require("telegraf");
 const { call } = require("../google-engine/google-api");
 
 const bot = new Telegraf(process.env.TOKEN);
-console.log(process.env.TOKEN)
 
 const wordBot = () => {
   bot.start(async (ctx) => {
