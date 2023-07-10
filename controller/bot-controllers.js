@@ -132,8 +132,12 @@ const wordBot = () => {
     }
 
     let newArray = ctx.wizard.state.array;
-
-    const responseFinal = await messageCompose(newArray);
+    let responseFinal;
+    try {
+      responseFinal = await messageCompose(newArray);
+    } catch (err) {
+      console.log(err);
+    }
 
     let number = responseFinal[1];
     ctx.wizard.state.data = text[number][1];
@@ -153,7 +157,12 @@ const wordBot = () => {
   const wordsDataWizard = new Scenes.WizardScene(
     "words",
     async (ctx) => {
-      const responseFinal = await messageCompose();
+      let responseFinal;
+      try {
+        responseFinal = await messageCompose();
+      } catch (err) {
+        console.log(err);
+      }
       let number = responseFinal[1];
       ctx.wizard.state.data = text[number][1];
       ctx.wizard.state.array = [text[number][0], text[number][1]];

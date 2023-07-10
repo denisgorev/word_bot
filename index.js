@@ -1,6 +1,7 @@
 const express = require("express");
 require('dotenv').config()
 const wordBot = require("./controller/bot-controllers");
+const axios = require('axios');
 
 
 const app = express();
