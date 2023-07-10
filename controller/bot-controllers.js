@@ -201,6 +201,42 @@ const wordBot = () => {
       }
     },
     async (ctx) => {
+      try {
+        await wordBotInteraction(ctx);
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteraction(ctx);
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteraction(ctx);
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteraction(ctx);
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteraction(ctx);
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
+    async (ctx) => {
       if (ctx.callbackQuery.data == ctx.wizard.state.data) {
         ctx.reply("Correct! Good Job");
       } else {
