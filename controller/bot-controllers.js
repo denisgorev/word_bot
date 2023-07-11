@@ -28,13 +28,11 @@ const getRandomInt = (min, max) => {
 
 const numberGen = (length, outputText) => {
   let number_new;
-
   number_new = getRandomInt(1, length);
-
   return outputText[number_new];
 };
 
-const messageCompose = async (minus = []) => {
+const messageCompose = async (minus = [], reg = true) => {
   let response;
   const arrayButtons = [];
   try {
@@ -47,23 +45,28 @@ const messageCompose = async (minus = []) => {
   }
 
   let length = text.length - 1;
-
   let number = getRandomInt(1, length);
-  arrayButtons.push(text[number][1]);
+  if (reg) {
+    arrayButtons.push(text[number][1]);
+  } else {
+    arrayButtons.push(text[number][0]);
+  }
+
   let lengthAnswers = response.length - 2;
   let responseAnswers = response;
-  let finalText = text[number]; //only for test purposes
-  // console.log(finalText) //only for test purposes
+  let finalText = text[number];
 
+  //generation of 3 wrong answers
   for (let i = 1; i < 3; i++) {
-    responseAnswers = subtractArrays(responseAnswers, finalText);
-    // console.log(responseAnswers);
-    // console.log(lengthAnswers);
+    responseAnswers = subtractArrays(responseAnswers, finalText); //list of possible wrong answers, created by substracting already taken options from the whole list
     finalText = numberGen(lengthAnswers, responseAnswers);
-    // console.log(finalText);
-    arrayButtons.push(finalText[1]);
+    if (reg) {
+      arrayButtons.push(finalText[1]);
+    } else {
+      arrayButtons.push(finalText[0]);
+    }
+
     lengthAnswers = lengthAnswers - 1;
-    // responseAnswers = subtractArrays(responseAnswers, finalText);
   }
   let arrayButtonsFinal = shuffleArray(arrayButtons);
   return [arrayButtonsFinal, number, text];
@@ -111,6 +114,45 @@ const wordBot = () => {
     ctx.replyWithHTML(text.join("").toString());
   });
 
+  const wordBotInteractionVV = async (ctx) => {
+    if (ctx.callbackQuery.data === "exit") {
+      ctx.reply(`You left the learning mode`);
+      return ctx.scene.leave();
+    }
+    if (ctx.callbackQuery === undefined) {
+      ctx.reply(`You should select an option`);
+      return;
+    }
+    if (ctx.callbackQuery === "exit") {
+      return ctx.scene.leave();
+    }
+    if (ctx.callbackQuery.data == ctx.wizard.state.data) {
+      ctx.reply("Correct!");
+    } else {
+      ctx.reply("Incorrect! Try one more time");
+      return;
+    }
+    let newArray = ctx.wizard.state.array;
+    let responseFinal;
+    try {
+      responseFinal = await messageCompose(newArray, false);
+    } catch (err) {
+      console.log(err);
+    }
+    let number = responseFinal[1];
+    ctx.wizard.state.data = text[number][0];
+    ctx.wizard.state.array = newArray.concat([
+      text[number][0],
+      text[number][1],
+    ]);
+    ctx.replyWithHTML(
+      `What does <b>${text[number][1]}</b> mean in Dutch?`,
+      yesNoKeyboard(responseFinal[0])
+    );
+    return ctx.wizard.next();
+  };
+
+  //main function for the words learning mode
   const wordBotInteraction = async (ctx) => {
     if (ctx.callbackQuery.data === "exit") {
       ctx.reply(`You left the learning mode`);
@@ -123,14 +165,12 @@ const wordBot = () => {
     if (ctx.callbackQuery === "exit") {
       return ctx.scene.leave();
     }
-
     if (ctx.callbackQuery.data == ctx.wizard.state.data) {
       ctx.reply("Correct!");
     } else {
       ctx.reply("Incorrect! Try one more time");
       return;
     }
-
     let newArray = ctx.wizard.state.array;
     let responseFinal;
     try {
@@ -150,7 +190,6 @@ const wordBot = () => {
       `What does <b>${text[number][0]}</b> mean?`,
       yesNoKeyboard(responseFinal[0])
     );
-
     return ctx.wizard.next();
   };
 
@@ -181,7 +220,7 @@ const wordBot = () => {
     },
     async (ctx) => {
       try {
-        await wordBotInteraction(ctx);
+        await wordBotInteractionVV(ctx);
       } catch (err) {
         console.log(err);
       }
@@ -195,7 +234,7 @@ const wordBot = () => {
     },
     async (ctx) => {
       try {
-        await wordBotInteraction(ctx);
+        await wordBotInteractionVV(ctx);
       } catch (err) {
         console.log(err);
       }
@@ -209,7 +248,7 @@ const wordBot = () => {
     },
     async (ctx) => {
       try {
-        await wordBotInteraction(ctx);
+        await wordBotInteractionVV(ctx);
       } catch (err) {
         console.log(err);
       }
@@ -223,7 +262,7 @@ const wordBot = () => {
     },
     async (ctx) => {
       try {
-        await wordBotInteraction(ctx);
+        await wordBotInteractionVV(ctx);
       } catch (err) {
         console.log(err);
       }
@@ -231,6 +270,29 @@ const wordBot = () => {
     async (ctx) => {
       try {
         await wordBotInteraction(ctx);
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteractionVV(ctx);
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
+    async (ctx) => {
+      try {
+        await wordBotInteractionVV(ctx);
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
+    async (ctx) => {
+      try {
+        await wordBotInteractionVV(ctx);
       } catch (err) {
         console.log(err);
       }
@@ -238,7 +300,7 @@ const wordBot = () => {
 
     async (ctx) => {
       if (ctx.callbackQuery.data == ctx.wizard.state.data) {
-        ctx.reply("Correct! Good Job");
+        ctx.reply("Correct! Good Job! The session is complete");
       } else {
         ctx.reply("Incorrect! Try one more time");
         return;
