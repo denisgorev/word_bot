@@ -77,10 +77,10 @@ const allWordsCallArray = async (mode, type) => {
 
   if (type == "words") {
     response = await call("words");
+
   }
   if (type == "phrases") {
     response = await call("phrases");
-    console.log('check phrases')
   }
   try {
     wordArray = response.values;
@@ -105,13 +105,25 @@ const allWordsCallArray = async (mode, type) => {
 
 const wordBot = () => {
   bot.start((ctx) => {
-    ctx.replyWithHTML(`Привет, ${ctx.from.first_name}! Давай изучать слова!`);
+    ctx.replyWithHTML(`Hi, ${ctx.from.first_name}! Let's learn some new words! Please select a mode from "menu". 
+    Please note it could take some time to start a session`);
   });
 
   bot.command("allwords", async (ctx) => {
     let text;
     try {
-      text = await allWordsCallArray("output");
+      text = await allWordsCallArray("output", "words");
+    } catch (err) {
+      console.log(err);
+      process.exit(1);
+    }
+    ctx.replyWithHTML(text.join("").toString());
+  });
+
+  bot.command("allphrases", async (ctx) => {
+    let text;
+    try {
+      text = await allWordsCallArray("output", "phrases");
     } catch (err) {
       console.log(err);
       process.exit(1);
