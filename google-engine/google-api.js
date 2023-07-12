@@ -1,4 +1,4 @@
-const call = async () => {
+const call = async (type = "words") => {
   const credentials = JSON.parse(process.env.keys);
   const { google } = require("googleapis");
   const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
@@ -12,18 +12,25 @@ const call = async () => {
       version: "v4",
       auth: authClientObject,
     });
-    
+    let readData;
     const spreadsheetId = "1I275HAkbd8W9bPwwl9kV0pnscdQ_0b38aMoncSjEYuY";
-    const readData = await googleSheetsInstance.spreadsheets.values.get({
-      auth, //auth object
-      spreadsheetId, // spreadsheet id
-      range: "Words!A:B", //range of cells to read from.
-    });
+    if (type == "words") {
+      readData = await googleSheetsInstance.spreadsheets.values.get({
+        auth, //auth object
+        spreadsheetId, // spreadsheet id
+        range: "Words!A:B", //range of cells to read from.
+      });
+    }
+    if (type == "phrases") {
+      readData = await googleSheetsInstance.spreadsheets.values.get({
+        auth, //auth object
+        spreadsheetId, // spreadsheet id
+        range: "Phrases!A:B", //range of cells to read from.
+      });
+    }
 
-
-  // console.log(readData.data);
-  return readData.data;
-} catch (err) {
+    return readData.data;
+  } catch (err) {
     console.log(err);
   }
 };

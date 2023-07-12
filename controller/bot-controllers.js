@@ -32,13 +32,12 @@ const numberGen = (length, outputText) => {
   return outputText[number_new];
 };
 
-const messageCompose = async (minus = [], reg = true) => {
+const messageCompose = async (minus = [], reg = true, type = "words") => {
   let response;
   const arrayButtons = [];
   try {
-    response = await allWordsCallArray("array");
+    response = await allWordsCallArray("array", type);
     text = subtractArrays(response, minus);
-    // console.log(text);
   } catch (err) {
     console.log(err);
     process.exit(1);
@@ -72,12 +71,18 @@ const messageCompose = async (minus = [], reg = true) => {
   return [arrayButtonsFinal, number, text];
 };
 
-const allWordsCallArray = async (mode) => {
+const allWordsCallArray = async (mode, type) => {
   let response;
   let wordArray;
 
+  if (type == "words") {
+    response = await call("words");
+  }
+  if (type == "phrases") {
+    response = await call("phrases");
+    console.log('check phrases')
+  }
   try {
-    response = await call();
     wordArray = response.values;
   } catch (err) {
     console.log(err);
@@ -114,7 +119,7 @@ const wordBot = () => {
     ctx.replyWithHTML(text.join("").toString());
   });
 
-  const wordBotInteractionVV = async (ctx) => {
+  const wordBotInteractionVV = async (ctx, type = "words") => {
     if (ctx.callbackQuery.data === "exit") {
       ctx.reply(`You left the learning mode`);
       return ctx.scene.leave();
@@ -135,7 +140,7 @@ const wordBot = () => {
     let newArray = ctx.wizard.state.array;
     let responseFinal;
     try {
-      responseFinal = await messageCompose(newArray, false);
+      responseFinal = await messageCompose(newArray, false, type);
     } catch (err) {
       console.log(err);
     }
@@ -153,7 +158,7 @@ const wordBot = () => {
   };
 
   //main function for the words learning mode
-  const wordBotInteraction = async (ctx) => {
+  const wordBotInteraction = async (ctx, type = "words") => {
     if (ctx.callbackQuery.data === "exit") {
       ctx.reply(`You left the learning mode`);
       return ctx.scene.leave();
@@ -174,7 +179,7 @@ const wordBot = () => {
     let newArray = ctx.wizard.state.array;
     let responseFinal;
     try {
-      responseFinal = await messageCompose(newArray);
+      responseFinal = await messageCompose(newArray, true, type);
     } catch (err) {
       console.log(err);
     }
@@ -185,7 +190,6 @@ const wordBot = () => {
       text[number][0],
       text[number][1],
     ]);
-    // console.log(ctx.wizard.state.array);
     ctx.replyWithHTML(
       `What does <b>${text[number][0]}</b> mean?`,
       yesNoKeyboard(responseFinal[0])
@@ -196,6 +200,9 @@ const wordBot = () => {
   const wordsDataWizard = new Scenes.WizardScene(
     "words",
     async (ctx) => {
+      ctx.replyWithHTML(
+        "Please wait until the session starts. It could take up to 30 seconds"
+      );
       let responseFinal;
       try {
         responseFinal = await messageCompose();
@@ -309,14 +316,141 @@ const wordBot = () => {
     }
   );
 
+
+
+  const wordsPhrasesWizard = new Scenes.WizardScene(
+    "phrases",
+    async (ctx) => {
+      ctx.replyWithHTML(
+        "Please wait until the session starts. It could take up to 30 seconds"
+      );
+      let responseFinal;
+      let type = "phrases"
+      try {
+        responseFinal = await messageCompose([], true, 'phrases');
+      } catch (err) { 
+        console.log(err);
+      }
+      let number = responseFinal[1];
+      ctx.wizard.state.data = text[number][1];
+      ctx.wizard.state.array = [text[number][0], text[number][1]];
+      ctx.replyWithHTML(
+        `What does <b>${text[number][0]}</b> mean?`,
+        yesNoKeyboard(responseFinal[0])
+      );
+      return ctx.wizard.next();
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteraction(ctx, ([], true, "phrases"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteractionVV(ctx, ([], false, "phrases"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteraction(ctx, ([], true, "phrases"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteractionVV(ctx, (type = "phrases"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteraction(ctx, (type = "phrases"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteractionVV(ctx, (type = "phrases"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteraction(ctx, (type = "phrases"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteractionVV(ctx, (type = "phrases"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteraction(ctx, (type = "phrases"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteractionVV(ctx, (type = "phrases"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
+    async (ctx) => {
+      try {
+        await wordBotInteractionVV(ctx, (type = "phrases"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
+    async (ctx) => {
+      try {
+        await wordBotInteractionVV(ctx, (type = "phrases"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
+    async (ctx) => {
+      if (ctx.callbackQuery.data == ctx.wizard.state.data) {
+        ctx.reply("Correct! Good Job! The session is complete");
+      } else {
+        ctx.reply("Incorrect! Try one more time");
+        return;
+      }
+      return ctx.scene.leave();
+    }
+  );
+
   const stage = new Scenes.Stage([
     wordsDataWizard,
+    wordsPhrasesWizard,
     // startDataWizard,
   ]);
   bot.use(session());
   bot.use(stage.middleware());
   bot.command("words", (ctx) => {
     ctx.scene.enter("words");
+  });
+  bot.command("phrases", (ctx) => {
+    ctx.scene.enter("phrases");
+    
   });
 
   bot.launch();
