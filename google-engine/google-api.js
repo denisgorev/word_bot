@@ -29,6 +29,14 @@ const call = async (type = "words") => {
       });
     }
 
+    if (type == "english") {
+      readData = await googleSheetsInstance.spreadsheets.values.get({
+        auth, //auth object
+        spreadsheetId, // spreadsheet id
+        range: "English!A:B", //range of cells to read from.
+      });
+    }
+
     return readData.data;
   } catch (err) {
     console.log(err);

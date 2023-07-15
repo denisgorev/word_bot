@@ -2,6 +2,7 @@ const { Telegraf } = require("telegraf");
 const { call } = require("../google-engine/google-api");
 const { yesNoKeyboard } = require("../utils/keyboards");
 const { Scenes, Stage, session } = require("telegraf");
+const { sessionGenerator } = require("./session-generator");
 
 const bot = new Telegraf(process.env.TOKEN);
 let text = "";
@@ -77,10 +78,12 @@ const allWordsCallArray = async (mode, type) => {
 
   if (type == "words") {
     response = await call("words");
-
   }
   if (type == "phrases") {
     response = await call("phrases");
+  }
+  if (type == "english") {
+    response = await call("english");
   }
   try {
     wordArray = response.values;
@@ -105,8 +108,9 @@ const allWordsCallArray = async (mode, type) => {
 
 const wordBot = () => {
   bot.start((ctx) => {
-    ctx.replyWithHTML(`Hi, ${ctx.from.first_name}! Let's learn some new words! Please select a mode from "menu". 
-    Please note it could take some time to start a session`);
+    ctx.replyWithHTML(
+      `Hi, ${ctx.from.first_name}! Let's learn some new words! Please select a mode from "menu". Please note it could take some time to start a session`
+    );
   });
 
   bot.command("allwords", async (ctx) => {
@@ -131,6 +135,7 @@ const wordBot = () => {
     ctx.replyWithHTML(text.join("").toString());
   });
 
+  //main function for the words learning mode for vice versa
   const wordBotInteractionVV = async (ctx, type = "words") => {
     if (ctx.callbackQuery.data === "exit") {
       ctx.reply(`You left the learning mode`);
@@ -163,7 +168,7 @@ const wordBot = () => {
       text[number][1],
     ]);
     ctx.replyWithHTML(
-      `What does <b>${text[number][1]}</b> mean in Dutch?`,
+      `What does <b>${text[number][1]}</b> mean`,
       yesNoKeyboard(responseFinal[0])
     );
     return ctx.wizard.next();
@@ -212,9 +217,6 @@ const wordBot = () => {
   const wordsDataWizard = new Scenes.WizardScene(
     "words",
     async (ctx) => {
-      ctx.replyWithHTML(
-        "Please wait until the session starts. It could take up to 30 seconds"
-      );
       let responseFinal;
       try {
         responseFinal = await messageCompose();
@@ -328,8 +330,6 @@ const wordBot = () => {
     }
   );
 
-
-
   const wordsPhrasesWizard = new Scenes.WizardScene(
     "phrases",
     async (ctx) => {
@@ -337,10 +337,9 @@ const wordBot = () => {
         "Please wait until the session starts. It could take up to 30 seconds"
       );
       let responseFinal;
-      let type = "phrases"
       try {
-        responseFinal = await messageCompose([], true, 'phrases');
-      } catch (err) { 
+        responseFinal = await messageCompose([], true, "phrases");
+      } catch (err) {
         console.log(err);
       }
       let number = responseFinal[1];
@@ -450,10 +449,119 @@ const wordBot = () => {
     }
   );
 
+  const engMode = new Scenes.WizardScene(
+    "english",
+    async (ctx) => {
+      ctx.replyWithHTML(
+        "Please wait until the session starts. It could take up to 30 seconds"
+      );
+      let responseFinal;
+      try {
+        responseFinal = await messageCompose([], true, "english");
+      } catch (err) {
+        console.log(err);
+      }
+      let number = responseFinal[1];
+      ctx.wizard.state.data = text[number][1];
+      ctx.wizard.state.array = [text[number][0], text[number][1]];
+      ctx.replyWithHTML(
+        `What does <b>${text[number][0]}</b> mean?`,
+        yesNoKeyboard(responseFinal[0])
+      );
+      return ctx.wizard.next();
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteraction(ctx, ([], true, "english"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteraction(ctx, ([], true, "english"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteractionVV(ctx, (type = "english"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteraction(ctx, (type = "english"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteractionVV(ctx, (type = "english"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteraction(ctx, (type = "english"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteractionVV(ctx, (type = "english"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteraction(ctx, (type = "english"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteractionVV(ctx, (type = "english"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteractionVV(ctx, (type = "english"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteractionVV(ctx, (type = "english"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      if (ctx.callbackQuery.data == ctx.wizard.state.data) {
+        ctx.reply("Correct! Good Job! The session is complete");
+      } else {
+        ctx.reply("Incorrect! Try one more time");
+        return;
+      }
+      return ctx.scene.leave();
+    }
+  );
+
   const stage = new Scenes.Stage([
     wordsDataWizard,
     wordsPhrasesWizard,
-    // startDataWizard,
+    engMode,
   ]);
   bot.use(session());
   bot.use(stage.middleware());
@@ -462,7 +570,9 @@ const wordBot = () => {
   });
   bot.command("phrases", (ctx) => {
     ctx.scene.enter("phrases");
-    
+  });
+  bot.command("english", (ctx) => {
+    ctx.scene.enter("english");
   });
 
   bot.launch();
