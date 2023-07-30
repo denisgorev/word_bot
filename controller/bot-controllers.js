@@ -34,7 +34,6 @@ const numberGen = (length, outputText) => {
 };
 
 const messageComposeType = async (minus = [], reg = true, type = "words") => {
-  console.log(type);
   let response;
 
   try {
@@ -73,7 +72,7 @@ const messageCompose = async (minus = [], reg = true, type = "words") => {
   let lengthAnswers = response.length - 2;
   let responseAnswers = response;
   let preFinalText = text[number];
-  let finalText = preFinalText.map(word => word.toLowerCase());
+  let finalText = preFinalText.map(word => word.toLowerCase().trim());
 
   //generation of 3 wrong answers
   for (let i = 1; i < 3; i++) {
@@ -171,16 +170,22 @@ const wordBot = () => {
       return;
     }
     if (ctx.message !== undefined) {
+
       if (ctx.message.text.toLowerCase() == ctx.wizard.state.data) {
         ctx.reply("Correct!");
         i_count = 0;
-      } else {
+      }
+      else if (ctx.message.text == 'idk') {
+        ctx.reply(`The correct answer is: ${ctx.wizard.state.data}`);
+        i_count = 0;
+      }
+      else {
         if (i_count >= 2) {
           ctx.reply(
             `The correct answer is: ${ctx.wizard.state.data}. No worries! Now type the correct word`
           );
         } else {
-          ctx.reply("Incorrect! Try one more time");
+          ctx.reply("Incorrect! Try one more time or type 'idk' ");
         }
 
         i_count = i_count + 1;
@@ -348,6 +353,17 @@ const wordBot = () => {
     },
     async (ctx) => {
       try {
+        await wordBotInteraction(
+          ctx,
+          (type = "words"),
+          (modeType = "reversed")
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
         await wordBotInteraction(ctx);
       } catch (err) {
         console.log(err);
@@ -367,6 +383,31 @@ const wordBot = () => {
     async (ctx) => {
       try {
         await wordBotInteraction(ctx);
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteraction(ctx, (type = "words"), (modeType = "typing"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteraction(
+          ctx,
+          (type = "words"),
+          (modeType = "reversed")
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    async (ctx) => {
+      try {
+        await wordBotInteraction(ctx, (type = "words"), (modeType = "typing"));
       } catch (err) {
         console.log(err);
       }
