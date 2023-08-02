@@ -72,7 +72,7 @@ const messageCompose = async (minus = [], reg = true, type = "words") => {
   let lengthAnswers = response.length - 2;
   let responseAnswers = response;
   let preFinalText = text[number];
-  let finalText = preFinalText.map(word => word.toLowerCase().trim());
+  let finalText = preFinalText.map((word) => word.toLowerCase().trim());
 
   //generation of 3 wrong answers
   for (let i = 1; i < 3; i++) {
@@ -139,7 +139,12 @@ const wordBot = () => {
       console.log(err);
       process.exit(1);
     }
-    ctx.replyWithHTML(text.join("").toString());
+    const getKey = (str) => str.split(":")[0];
+
+    // Sort the array by the key in alphabetical order
+    const sortedData = text.sort((a, b) => getKey(a).localeCompare(getKey(b)));
+
+    ctx.replyWithHTML(sortedData.join("").toString());
   });
 
   bot.command("allphrases", async (ctx) => {
@@ -164,22 +169,23 @@ const wordBot = () => {
     type = "words",
     modeType = "direct"
   ) => {
-
     if (ctx.callbackQuery === undefined && ctx.message.text === undefined) {
       ctx.reply(`You should select an option`);
       return;
     }
+
     if (ctx.message !== undefined) {
+      if (ctx.wizard.state == undefined) {
+        return ctx.scene.leave();
+      }
 
       if (ctx.message.text.toLowerCase() == ctx.wizard.state.data) {
         ctx.reply("Correct!");
         i_count = 0;
-      }
-      else if (ctx.message.text == 'idk') {
+      } else if (ctx.message.text == "idk" || ctx.message.text == "Idk") {
         ctx.reply(`The correct answer is: ${ctx.wizard.state.data}`);
         i_count = 0;
-      }
-      else {
+      } else {
         if (i_count >= 2) {
           ctx.reply(
             `The correct answer is: ${ctx.wizard.state.data}. No worries! Now type the correct word`
@@ -237,6 +243,10 @@ const wordBot = () => {
       number = responseFinal[0];
     }
     if (modeType == "direct") {
+      if (text[number] == undefined) {
+        ctx.reply(`There are no more questions. You left the learning mode`);
+        return ctx.scene.leave();
+      }
       ctx.wizard.state.data = text[number][1];
       ctx.wizard.state.array = newArray.concat([
         text[number][0],
@@ -248,6 +258,10 @@ const wordBot = () => {
       );
     }
     if (modeType == "reversed") {
+      if (text[number] == undefined) {
+        ctx.reply(`There are no more questions. You left the learning mode`);
+        return ctx.scene.leave();
+      }
       ctx.wizard.state.data = text[number][0];
       ctx.wizard.state.array = newArray.concat([
         text[number][0],
@@ -259,6 +273,10 @@ const wordBot = () => {
       );
     }
     if (modeType == "typing") {
+      if (text[number] == undefined) {
+        ctx.reply(`There are no more questions. You left the learning mode`);
+        return ctx.scene.leave();
+      }
       ctx.wizard.state.data = text[number][0];
       ctx.wizard.state.array = newArray.concat([
         text[number][0],
@@ -622,29 +640,24 @@ const wordBot = () => {
     },
     async (ctx) => {
       try {
-        await wordBotInteraction(ctx, ([], true, "english"));
+        await wordBotInteraction(ctx, (type = "english"));
       } catch (err) {
         console.log(err);
       }
     },
-    async (ctx) => {
-      try {
-        await wordBotInteraction(ctx, ([], true, "english"));
-      } catch (err) {
-        console.log(err);
-      }
-    },
+
     async (ctx) => {
       try {
         await wordBotInteraction(
           ctx,
           (type = "english"),
-          (modeType = "reversed")
+          (modeType = "typing")
         );
       } catch (err) {
         console.log(err);
       }
     },
+
     async (ctx) => {
       try {
         await wordBotInteraction(ctx, (type = "english"));
@@ -652,6 +665,19 @@ const wordBot = () => {
         console.log(err);
       }
     },
+
+    async (ctx) => {
+      try {
+        await wordBotInteraction(
+          ctx,
+          (type = "english"),
+          (modeType = "typing")
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
     async (ctx) => {
       try {
         await wordBotInteraction(
@@ -663,6 +689,55 @@ const wordBot = () => {
         console.log(err);
       }
     },
+
+    async (ctx) => {
+      try {
+        await wordBotInteraction(
+          ctx,
+          (type = "english"),
+          (modeType = "typing")
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
+    async (ctx) => {
+      try {
+        await wordBotInteraction(
+          ctx,
+          (type = "english"),
+          (modeType = "typing")
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
+    async (ctx) => {
+      try {
+        await wordBotInteraction(
+          ctx,
+          (type = "english"),
+          (modeType = "reversed")
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
+    async (ctx) => {
+      try {
+        await wordBotInteraction(
+          ctx,
+          (type = "english"),
+          (modeType = "typing")
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
     async (ctx) => {
       try {
         await wordBotInteraction(ctx, (type = "english"));
@@ -670,6 +745,31 @@ const wordBot = () => {
         console.log(err);
       }
     },
+
+    async (ctx) => {
+      try {
+        await wordBotInteraction(
+          ctx,
+          (type = "english"),
+          (modeType = "typing")
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
+    async (ctx) => {
+      try {
+        await wordBotInteraction(
+          ctx,
+          (type = "english"),
+          (modeType = "typing")
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
     async (ctx) => {
       try {
         await wordBotInteraction(
@@ -681,6 +781,43 @@ const wordBot = () => {
         console.log(err);
       }
     },
+
+    async (ctx) => {
+      try {
+        await wordBotInteraction(
+          ctx,
+          (type = "english"),
+          (modeType = "typing")
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
+    async (ctx) => {
+      try {
+        await wordBotInteraction(
+          ctx,
+          (type = "english"),
+          (modeType = "reversed")
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
+    async (ctx) => {
+      try {
+        await wordBotInteraction(
+          ctx,
+          (type = "english"),
+          (modeType = "typing")
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
     async (ctx) => {
       try {
         await wordBotInteraction(ctx, (type = "english"));
@@ -688,6 +825,19 @@ const wordBot = () => {
         console.log(err);
       }
     },
+
+    async (ctx) => {
+      try {
+        await wordBotInteraction(
+          ctx,
+          (type = "english"),
+          (modeType = "typing")
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
     async (ctx) => {
       try {
         await wordBotInteraction(
@@ -699,6 +849,19 @@ const wordBot = () => {
         console.log(err);
       }
     },
+
+    async (ctx) => {
+      try {
+        await wordBotInteraction(
+          ctx,
+          (type = "english"),
+          (modeType = "typing")
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
     async (ctx) => {
       try {
         await wordBotInteraction(
@@ -710,18 +873,37 @@ const wordBot = () => {
         console.log(err);
       }
     },
+
     async (ctx) => {
       try {
         await wordBotInteraction(
           ctx,
           (type = "english"),
-          (modeType = "reversed")
+          (modeType = "typing")
         );
       } catch (err) {
         console.log(err);
       }
     },
+
     async (ctx) => {
+      try {
+        await wordBotInteraction(
+          ctx,
+          (type = "english"),
+          (modeType = "typing")
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
+    async (ctx) => {
+      if (ctx.callbackQuery == undefined) {
+        ctx.reply("Correct! Good Job! The session is complete");
+        return ctx.scene.leave();
+      }
+
       if (ctx.callbackQuery.data == ctx.wizard.state.data) {
         ctx.reply("Correct! Good Job! The session is complete");
       } else {
