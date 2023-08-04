@@ -50,6 +50,10 @@ const messageComposeType = async (minus = [], reg = true, type = "words") => {
   return [number, text];
 };
 
+const byteSize = (str) => {
+  return new Blob([str]).size;
+};
+
 const messageCompose = async (minus = [], reg = true, type = "words") => {
   let response;
   const arrayButtons = [];
@@ -63,6 +67,25 @@ const messageCompose = async (minus = [], reg = true, type = "words") => {
 
   let length = text.length - 1;
   let number = getRandomInt(1, length);
+  let attemps = 0;
+
+  while (byteSize(text[number][1]) > 65) {
+    if (attemps > 4) {
+      break;
+    }
+    number = getRandomInt(1, length);
+    // let check = byteSize(text[number][1]); //to delete
+    // console.log("while loop first check", text[number][1], check, attemps); //to delete
+    attemps++;
+  }
+
+  if (byteSize(text[number][1]) > 65) {
+    return;
+  }
+
+  if (text[number] == undefined) {
+    return;
+  }
   if (reg) {
     arrayButtons.push(text[number][1]);
   } else {
@@ -72,12 +95,25 @@ const messageCompose = async (minus = [], reg = true, type = "words") => {
   let lengthAnswers = response.length - 2;
   let responseAnswers = response;
   let preFinalText = text[number];
+
   let finalText = preFinalText.map((word) => word.toLowerCase().trim());
 
   //generation of 3 wrong answers
-  for (let i = 1; i < 3; i++) {
+  for (let i = 1; i < 4; i++) {
     responseAnswers = subtractArrays(responseAnswers, finalText); //list of possible wrong answers, created by substracting already taken options from the whole list
     finalText = numberGen(lengthAnswers, responseAnswers);
+    attemps = 0;
+    while (byteSize(finalText[1]) > 65 || attemps > 4) {
+      finalText = numberGen(lengthAnswers, responseAnswers);
+    }
+
+    if (byteSize(finalText[1]) > 65) {
+      return;
+    }
+
+    if (finalText == undefined) {
+      return;
+    }
     if (reg) {
       arrayButtons.push(finalText[1]);
     } else {
@@ -238,7 +274,14 @@ const wordBot = () => {
         console.log(err);
       }
     }
+
+    if (responseFinal == undefined) {
+      ctx.reply(`Very good! There are no more words in the list, so you left the learning mode`);
+      return ctx.scene.leave();
+    }
+
     let number = responseFinal[1];
+
     if (modeType == "typing") {
       number = responseFinal[0];
     }
@@ -326,6 +369,15 @@ const wordBot = () => {
         console.log(err);
       }
     },
+
+    async (ctx) => {
+      try {
+        await wordBotInteraction(ctx, (type = "words"), (modeType = "typing"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
     async (ctx) => {
       try {
         await wordBotInteraction(ctx);
@@ -340,6 +392,15 @@ const wordBot = () => {
         console.log(err);
       }
     },
+
+    async (ctx) => {
+      try {
+        await wordBotInteraction(ctx, (type = "words"), (modeType = "typing"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
     async (ctx) => {
       try {
         await wordBotInteraction(
@@ -360,15 +421,20 @@ const wordBot = () => {
     },
     async (ctx) => {
       try {
-        await wordBotInteraction(
-          ctx,
-          (type = "words"),
-          (modeType = "reversed")
-        );
+        await wordBotInteraction(ctx);
       } catch (err) {
         console.log(err);
       }
     },
+
+    async (ctx) => {
+      try {
+        await wordBotInteraction(ctx, (type = "words"), (modeType = "typing"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
     async (ctx) => {
       try {
         await wordBotInteraction(
@@ -387,6 +453,15 @@ const wordBot = () => {
         console.log(err);
       }
     },
+
+    async (ctx) => {
+      try {
+        await wordBotInteraction(ctx, (type = "words"), (modeType = "typing"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
     async (ctx) => {
       try {
         await wordBotInteraction(
@@ -620,14 +695,15 @@ const wordBot = () => {
   const engMode = new Scenes.WizardScene(
     "english",
     async (ctx) => {
-      ctx.replyWithHTML(
-        "Please wait until the session starts. It could take up to 30 seconds"
-      );
       let responseFinal;
       try {
         responseFinal = await messageCompose([], true, "english");
       } catch (err) {
         console.log(err);
+      }
+      if (responseFinal == undefined) {
+        ctx.replyWithHTML("Something went wrong, the session is over");
+        return ctx.scene.leave();
       }
       let number = responseFinal[1];
       ctx.wizard.state.data = text[number][1];
@@ -800,98 +876,6 @@ const wordBot = () => {
           ctx,
           (type = "english"),
           (modeType = "reversed")
-        );
-      } catch (err) {
-        console.log(err);
-      }
-    },
-
-    async (ctx) => {
-      try {
-        await wordBotInteraction(
-          ctx,
-          (type = "english"),
-          (modeType = "typing")
-        );
-      } catch (err) {
-        console.log(err);
-      }
-    },
-
-    async (ctx) => {
-      try {
-        await wordBotInteraction(ctx, (type = "english"));
-      } catch (err) {
-        console.log(err);
-      }
-    },
-
-    async (ctx) => {
-      try {
-        await wordBotInteraction(
-          ctx,
-          (type = "english"),
-          (modeType = "typing")
-        );
-      } catch (err) {
-        console.log(err);
-      }
-    },
-
-    async (ctx) => {
-      try {
-        await wordBotInteraction(
-          ctx,
-          (type = "english"),
-          (modeType = "reversed")
-        );
-      } catch (err) {
-        console.log(err);
-      }
-    },
-
-    async (ctx) => {
-      try {
-        await wordBotInteraction(
-          ctx,
-          (type = "english"),
-          (modeType = "typing")
-        );
-      } catch (err) {
-        console.log(err);
-      }
-    },
-
-    async (ctx) => {
-      try {
-        await wordBotInteraction(
-          ctx,
-          (type = "english"),
-          (modeType = "reversed")
-        );
-      } catch (err) {
-        console.log(err);
-      }
-    },
-
-    async (ctx) => {
-      try {
-        await wordBotInteraction(
-          ctx,
-          (type = "english"),
-          (modeType = "typing")
-        );
-      } catch (err) {
-        console.log(err);
-      }
-    },
-
-    async (ctx) => {
-      try {
-        await wordBotInteraction(
-          ctx,
-          (type = "english"),
-          (modeType = "typing")
         );
       } catch (err) {
         console.log(err);
