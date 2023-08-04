@@ -3,7 +3,7 @@ const { call } = require("../google-engine/google-api");
 const { yesNoKeyboard } = require("../utils/keyboards");
 const { Scenes, Stage, session } = require("telegraf");
 const { sessionGenerator } = require("./session-generator");
-import { Blob } from 'node:buffer';
+const {Blob} = require ('node:buffer');
 
 const bot = new Telegraf(process.env.TOKEN);
 let text = "";
