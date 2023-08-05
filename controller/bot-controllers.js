@@ -52,7 +52,7 @@ const messageComposeType = async (minus = [], reg = true, type = "words") => {
 };
 
 const byteSize = (str) => {
-  return new Blob([str]).size;
+  return Buffer.byteLength(str, 'utf8');
 };
 
 const messageCompose = async (minus = [], reg = true, type = "words") => {
@@ -75,8 +75,8 @@ const messageCompose = async (minus = [], reg = true, type = "words") => {
       break;
     }
     number = getRandomInt(1, length);
-    // let check = byteSize(text[number][1]); //to delete
-    // console.log("while loop first check", text[number][1], check, attemps); //to delete
+    let check = byteSize(text[number][1]); //to delete
+    console.log("while loop first check", text[number][1], check, attemps); //to delete
     attemps++;
   }
 
