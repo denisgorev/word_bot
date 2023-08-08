@@ -2,8 +2,7 @@ const { Telegraf } = require("telegraf");
 const { call } = require("../google-engine/google-api");
 const { yesNoKeyboard } = require("../utils/keyboards");
 const { Scenes, Stage, session } = require("telegraf");
-const { sessionGenerator } = require("./session-generator");
- const {Blob} = require ('buffer');
+const { getRandomWord } = require("./controller-functions");
 
 const bot = new Telegraf(process.env.TOKEN);
 let text = "";
@@ -45,19 +44,29 @@ const messageComposeType = async (minus = [], reg = true, type = "words") => {
     process.exit(1);
   }
 
-  let length = text.length - 1;
-  let number = getRandomInt(1, length);
+  if (type === "english") {
+
+    // Print the resulting wordList
+    const randomWord = getRandomWord(text);
+    number = randomWord.index;
+
+  } else {
+    let length = text.length - 1;
+    number = getRandomInt(1, length);
+  }
 
   return [number, text];
 };
 
 const byteSize = (str) => {
-  return Buffer.byteLength(str, 'utf8');
+  return Buffer.byteLength(str, "utf8");
 };
 
 const messageCompose = async (minus = [], reg = true, type = "words") => {
   let response;
+  let number;
   const arrayButtons = [];
+
   try {
     response = await allWordsCallArray("array", type);
     text = subtractArrays(response, minus);
@@ -66,17 +75,27 @@ const messageCompose = async (minus = [], reg = true, type = "words") => {
     process.exit(1);
   }
 
-  let length = text.length - 1;
-  let number = getRandomInt(1, length);
+  if (type == "english") {
+    // const header = text.shift();
+
+    // Print the resulting wordList
+    const randomWord = getRandomWord(text);
+    number = randomWord.index;
+  } else {
+    let length = text.length - 1;
+    number = getRandomInt(1, length);
+  }
+
   let attemps = 0;
 
+  //to check if the size of the text is less than 65 (otherwise the button generation will fail)
   while (byteSize(text[number][1]) > 65) {
     if (attemps > 4) {
       break;
     }
     number = getRandomInt(1, length);
-    let check = byteSize(text[number][1]); //to delete
-    console.log("while loop first check", text[number][1], check, attemps); //to delete
+    // let check = byteSize(text[number][1]); //to delete
+    // console.log("while loop first check", text[number][1], check, attemps); //to delete
     attemps++;
   }
 
@@ -99,7 +118,7 @@ const messageCompose = async (minus = [], reg = true, type = "words") => {
 
   let finalText = preFinalText.map((word) => word.toLowerCase().trim());
 
-  //generation of 3 wrong answers
+  //generation of 4 wrong answers
   for (let i = 1; i < 4; i++) {
     responseAnswers = subtractArrays(responseAnswers, finalText); //list of possible wrong answers, created by substracting already taken options from the whole list
     finalText = numberGen(lengthAnswers, responseAnswers);
@@ -140,6 +159,7 @@ const allWordsCallArray = async (mode, type) => {
   if (type == "english") {
     response = await call("english");
   }
+
   try {
     wordArray = response.values;
   } catch (err) {
@@ -212,7 +232,8 @@ const wordBot = () => {
     }
 
     if (ctx.message !== undefined) {
-      if (ctx.wizard.state == undefined) {
+      if (ctx.wizard.state == undefined || ctx.message.text === "exit") {
+        ctx.reply(`You left the learning mode`);
         return ctx.scene.leave();
       }
 
@@ -268,6 +289,14 @@ const wordBot = () => {
       }
     }
 
+    if (modeType == "new_test") {
+      try {
+        responseFinal = await messageCompose(newArray, (reg = false), type);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
     if (modeType == "typing") {
       try {
         responseFinal = await messageComposeType(newArray, (reg = false), type);
@@ -277,7 +306,9 @@ const wordBot = () => {
     }
 
     if (responseFinal == undefined) {
-      ctx.reply(`Very good! There are no more words in the list, so you left the learning mode`);
+      ctx.reply(
+        `Very good! There are no more words in the list, so you left the learning mode`
+      );
       return ctx.scene.leave();
     }
 
@@ -715,9 +746,45 @@ const wordBot = () => {
       );
       return ctx.wizard.next();
     },
+
+    async (ctx) => {
+      try {
+        await wordBotInteraction(
+          ctx,
+          (type = "english"),
+          (modeType = "typing")
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
     async (ctx) => {
       try {
         await wordBotInteraction(ctx, (type = "english"));
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
+    async (ctx) => {
+      try {
+        await wordBotInteraction(
+          ctx,
+          (type = "english"),
+          (modeType = "typing")
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    },
+
+    async (ctx) => {
+      try {
+        await wordBotInteraction(
+          ctx,
+          (type = "english")
+        );
       } catch (err) {
         console.log(err);
       }

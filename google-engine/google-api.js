@@ -14,6 +14,7 @@ const call = async (type = "words") => {
     });
     let readData;
     const spreadsheetId = "1I275HAkbd8W9bPwwl9kV0pnscdQ_0b38aMoncSjEYuY";
+
     if (type == "words") {
       readData = await googleSheetsInstance.spreadsheets.values.get({
         auth, //auth object
@@ -33,10 +34,9 @@ const call = async (type = "words") => {
       readData = await googleSheetsInstance.spreadsheets.values.get({
         auth, //auth object
         spreadsheetId, // spreadsheet id
-        range: "English!A:B", //range of cells to read from.
+        range: "English!A:C", //range of cells to read from.
       });
     }
-
     return readData.data;
   } catch (err) {
     console.log(err);
