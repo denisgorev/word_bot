@@ -45,7 +45,6 @@ const messageComposeType = async (minus = [], reg = true, type = "words") => {
   }
 
   if (type === "english") {
-
     // Print the resulting wordList
     const randomWord = getRandomWord(text);
     number = randomWord.index;
@@ -81,6 +80,7 @@ const messageCompose = async (minus = [], reg = true, type = "words") => {
     // Print the resulting wordList
     const randomWord = getRandomWord(text);
     number = randomWord.index;
+
   } else {
     let length = text.length - 1;
     number = getRandomInt(1, length);
@@ -282,14 +282,6 @@ const wordBot = () => {
       }
     }
     if (modeType == "reversed") {
-      try {
-        responseFinal = await messageCompose(newArray, (reg = false), type);
-      } catch (err) {
-        console.log(err);
-      }
-    }
-
-    if (modeType == "new_test") {
       try {
         responseFinal = await messageCompose(newArray, (reg = false), type);
       } catch (err) {
@@ -781,10 +773,7 @@ const wordBot = () => {
 
     async (ctx) => {
       try {
-        await wordBotInteraction(
-          ctx,
-          (type = "english")
-        );
+        await wordBotInteraction(ctx, (type = "english"));
       } catch (err) {
         console.log(err);
       }
