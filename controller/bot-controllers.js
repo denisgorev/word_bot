@@ -3,6 +3,8 @@ const { call } = require("../google-engine/google-api");
 const { yesNoKeyboard } = require("../utils/keyboards");
 const { Scenes, Stage, session } = require("telegraf");
 const { getRandomWord } = require("./controller-functions");
+var gtts = require('node-gtts')('en');
+var path = require('path');
 
 const bot = new Telegraf(process.env.TOKEN);
 let text = "";
@@ -48,7 +50,6 @@ const messageComposeType = async (minus = [], reg = true, type = "words") => {
     // Print the resulting wordList
     const randomWord = getRandomWord(text);
     number = randomWord.index;
-
   } else {
     let length = text.length - 1;
     number = getRandomInt(1, length);
@@ -80,7 +81,6 @@ const messageCompose = async (minus = [], reg = true, type = "words") => {
     // Print the resulting wordList
     const randomWord = getRandomWord(text);
     number = randomWord.index;
-
   } else {
     let length = text.length - 1;
     number = getRandomInt(1, length);
@@ -563,7 +563,9 @@ const wordBot = () => {
 
     async (ctx) => {
       if (ctx.callbackQuery.data == ctx.wizard.state.data) {
-        ctx.reply("Correct! Good Job! The session is complete. I will fall asleep soon, to wake me up please click on https://word-bot.onrender.com");
+        ctx.reply(
+          "Correct! Good Job! The session is complete. I will fall asleep soon, to wake me up please click on https://word-bot.onrender.com"
+        );
       } else {
         ctx.reply("Incorrect! Try one more time");
         return;
@@ -707,7 +709,9 @@ const wordBot = () => {
 
     async (ctx) => {
       if (ctx.callbackQuery.data == ctx.wizard.state.data) {
-        ctx.reply("Correct! Good Job! The session is complete. I will fall asleep soon, to wake me up please click on https://word-bot.onrender.com");
+        ctx.reply(
+          "Correct! Good Job! The session is complete. I will fall asleep soon, to wake me up please click on https://word-bot.onrender.com"
+        );
       } else {
         ctx.reply("Incorrect! Try one more time");
         return;
@@ -941,12 +945,16 @@ const wordBot = () => {
 
     async (ctx) => {
       if (ctx.callbackQuery == undefined) {
-        ctx.reply("Correct! Good Job! The session is complete. I will fall asleep soon, to wake me up please click on https://word-bot.onrender.com");
+        ctx.reply(
+          "Correct! Good Job! The session is complete. I will fall asleep soon, to wake me up please click on https://word-bot.onrender.com"
+        );
         return ctx.scene.leave();
       }
 
       if (ctx.callbackQuery.data == ctx.wizard.state.data) {
-        ctx.reply("Correct! Good Job! The session is complete. I will fall asleep soon, to wake me up please click on https://word-bot.onrender.com");
+        ctx.reply(
+          "Correct! Good Job! The session is complete. I will fall asleep soon, to wake me up please click on https://word-bot.onrender.com"
+        );
       } else {
         ctx.reply("Incorrect! Try one more time");
         return;
@@ -955,10 +963,40 @@ const wordBot = () => {
     }
   );
 
+  const voiceMode = new Scenes.WizardScene(
+    "voice",
+    (ctx) => {
+      ctx.reply(`write an english word`);
+      ctx.wizard.state.data = {};
+      return ctx.wizard.next();
+    },
+
+    async (ctx) => {
+
+      gtts.save("audio.wav", ctx.message.text, (err)=> {
+          if (err) {
+          console.error(err);
+        }
+        ctx.replyWithVoice({
+          source: './audio.wav',
+        });
+
+      })
+      // say.export("What's up, dog?", 'Good News', 1.0, 'hal.wav', (err) => {
+      //   if (err) {
+      //     console.error(err);
+      //   }
+       
+      // });
+      return ctx.scene.leave();
+    }
+  );
+
   const stage = new Scenes.Stage([
     wordsDataWizard,
     wordsPhrasesWizard,
     engMode,
+    voiceMode
   ]);
   bot.use(session());
   bot.use(stage.middleware());
@@ -970,6 +1008,9 @@ const wordBot = () => {
   });
   bot.command("english", (ctx) => {
     ctx.scene.enter("english");
+  });
+  bot.command("voice", (ctx) => {
+    ctx.scene.enter("voice");
   });
 
   bot.launch();
