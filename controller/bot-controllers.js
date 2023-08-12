@@ -563,7 +563,7 @@ const wordBot = () => {
 
     async (ctx) => {
       if (ctx.callbackQuery.data == ctx.wizard.state.data) {
-        ctx.reply("Correct! Good Job! The session is complete");
+        ctx.reply("Correct! Good Job! The session is complete. I will fall asleep soon, to wake me up please click on https://word-bot.onrender.com");
       } else {
         ctx.reply("Incorrect! Try one more time");
         return;
@@ -707,7 +707,7 @@ const wordBot = () => {
 
     async (ctx) => {
       if (ctx.callbackQuery.data == ctx.wizard.state.data) {
-        ctx.reply("Correct! Good Job! The session is complete");
+        ctx.reply("Correct! Good Job! The session is complete. I will fall asleep soon, to wake me up please click on https://word-bot.onrender.com");
       } else {
         ctx.reply("Incorrect! Try one more time");
         return;
@@ -941,12 +941,12 @@ const wordBot = () => {
 
     async (ctx) => {
       if (ctx.callbackQuery == undefined) {
-        ctx.reply("Correct! Good Job! The session is complete");
+        ctx.reply("Correct! Good Job! The session is complete. I will fall asleep soon, to wake me up please click on https://word-bot.onrender.com");
         return ctx.scene.leave();
       }
 
       if (ctx.callbackQuery.data == ctx.wizard.state.data) {
-        ctx.reply("Correct! Good Job! The session is complete");
+        ctx.reply("Correct! Good Job! The session is complete. I will fall asleep soon, to wake me up please click on https://word-bot.onrender.com");
       } else {
         ctx.reply("Incorrect! Try one more time");
         return;
