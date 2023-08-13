@@ -3,8 +3,8 @@ const { call } = require("../google-engine/google-api");
 const { yesNoKeyboard } = require("../utils/keyboards");
 const { Scenes, Stage, session } = require("telegraf");
 const { getRandomWord } = require("./controller-functions");
-var gtts = require('node-gtts')('en');
-var path = require('path');
+const { STT } = require("./speech-to-text");
+var gtts = require("node-gtts")("en");
 
 const bot = new Telegraf(process.env.TOKEN);
 let text = "";
@@ -239,15 +239,24 @@ const wordBot = () => {
 
       if (ctx.message.text.toLowerCase() == ctx.wizard.state.data) {
         ctx.reply("Correct!");
+        if (type == "english") {
+          STT(ctx, ctx.wizard.state.correct);
+        }
         i_count = 0;
       } else if (ctx.message.text == "idk" || ctx.message.text == "Idk") {
         ctx.reply(`The correct answer is: ${ctx.wizard.state.data}`);
+        if (type == "english") {
+          STT(ctx, ctx.wizard.state.correct);
+        }
         i_count = 0;
       } else {
         if (i_count >= 2) {
           ctx.reply(
             `The correct answer is: ${ctx.wizard.state.data}. No worries! Now type the correct word`
           );
+          if (type == "english") {
+            STT(ctx, ctx.wizard.state.correct);
+          }
         } else {
           ctx.reply("Incorrect! Try one more time or type 'idk' ");
         }
@@ -266,6 +275,15 @@ const wordBot = () => {
       }
       if (ctx.callbackQuery.data == ctx.wizard.state.data) {
         ctx.reply("Correct!");
+        console.log(ctx);
+        if (type == "english") {
+          console.log(
+            "check callbackQuery",
+            ctx.callbackQuery.data,
+            ctx.wizard.state.correct
+          );
+          STT(ctx, ctx.wizard.state.correct);
+        }
       } else {
         ctx.reply("Incorrect! Try one more time");
         return;
@@ -315,6 +333,8 @@ const wordBot = () => {
         return ctx.scene.leave();
       }
       ctx.wizard.state.data = text[number][1];
+      ctx.wizard.state.correct = text[number][0];
+      console.log(ctx.wizard.state.correct);
       ctx.wizard.state.array = newArray.concat([
         text[number][0],
         text[number][1],
@@ -330,6 +350,7 @@ const wordBot = () => {
         return ctx.scene.leave();
       }
       ctx.wizard.state.data = text[number][0];
+      ctx.wizard.state.correct = text[number][0];
       ctx.wizard.state.array = newArray.concat([
         text[number][0],
         text[number][1],
@@ -345,6 +366,7 @@ const wordBot = () => {
         return ctx.scene.leave();
       }
       ctx.wizard.state.data = text[number][0];
+      ctx.wizard.state.correct = text[number][0];
       ctx.wizard.state.array = newArray.concat([
         text[number][0],
         text[number][1],
@@ -735,6 +757,7 @@ const wordBot = () => {
       }
       let number = responseFinal[1];
       ctx.wizard.state.data = text[number][1];
+      ctx.wizard.state.correct = text[number][0];
       ctx.wizard.state.array = [text[number][0], text[number][1]];
       ctx.replyWithHTML(
         `What does <b>${text[number][0]}</b> mean?`,
@@ -972,21 +995,19 @@ const wordBot = () => {
     },
 
     async (ctx) => {
-
-      gtts.save("audio.wav", ctx.message.text, (err)=> {
-          if (err) {
+      gtts.save("audio.wav", ctx.message.text, (err) => {
+        if (err) {
           console.error(err);
         }
         ctx.replyWithVoice({
-          source: './audio.wav',
+          source: "./audio.wav",
         });
-
-      })
+      });
       // say.export("What's up, dog?", 'Good News', 1.0, 'hal.wav', (err) => {
       //   if (err) {
       //     console.error(err);
       //   }
-       
+
       // });
       return ctx.scene.leave();
     }
@@ -996,7 +1017,7 @@ const wordBot = () => {
     wordsDataWizard,
     wordsPhrasesWizard,
     engMode,
-    voiceMode
+    voiceMode,
   ]);
   bot.use(session());
   bot.use(stage.middleware());
