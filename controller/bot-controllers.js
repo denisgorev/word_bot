@@ -232,31 +232,37 @@ const wordBot = () => {
     }
 
     if (ctx.message !== undefined) {
-      if (ctx.wizard.state == undefined || ctx.message.text === "exit" || ctx.message.text === "Exit") {
+      if (
+        ctx.wizard.state == undefined ||
+        ctx.message.text === "exit" ||
+        ctx.message.text === "Exit"
+      ) {
         ctx.reply(`You left the learning mode`);
         return ctx.scene.leave();
       }
 
       if (ctx.message.text.toLowerCase() == ctx.wizard.state.data) {
-        ctx.reply("Correct!");
         if (type == "english") {
           await STT(ctx, ctx.wizard.state.correct);
         }
+        ctx.reply("Correct!");
+
         i_count = 0;
       } else if (ctx.message.text == "idk" || ctx.message.text == "Idk") {
-        ctx.reply(`The correct answer is: ${ctx.wizard.state.data}`);
+        
         if (type == "english") {
           await STT(ctx, ctx.wizard.state.correct);
         }
+        ctx.reply(`The correct answer is: ${ctx.wizard.state.data}`);
         i_count = 0;
       } else {
         if (i_count >= 2) {
-          ctx.reply(
-            `The correct answer is: ${ctx.wizard.state.data}. No worries! Now type the correct word`
-          );
           if (type == "english") {
             await STT(ctx, ctx.wizard.state.correct);
           }
+          ctx.reply(
+            `The correct answer is: ${ctx.wizard.state.data}. No worries! Now type the correct word`
+          );
         } else {
           ctx.reply("Incorrect! Try one more time or type 'idk' ");
         }
@@ -274,16 +280,11 @@ const wordBot = () => {
         return ctx.scene.leave();
       }
       if (ctx.callbackQuery.data == ctx.wizard.state.data) {
-        ctx.reply("Correct!");
-        console.log(ctx);
+        
         if (type == "english") {
-          console.log(
-            "check callbackQuery",
-            ctx.callbackQuery.data,
-            ctx.wizard.state.correct
-          );
           await STT(ctx, ctx.wizard.state.correct);
         }
+        ctx.reply("Correct!");
       } else {
         ctx.reply("Incorrect! Try one more time");
         return;
