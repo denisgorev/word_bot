@@ -232,7 +232,7 @@ const wordBot = () => {
     }
 
     if (ctx.message !== undefined) {
-      if (ctx.wizard.state == undefined || ctx.message.text === "exit") {
+      if (ctx.wizard.state == undefined || ctx.message.text === "exit" || ctx.message.text === "Exit") {
         ctx.reply(`You left the learning mode`);
         return ctx.scene.leave();
       }
@@ -240,13 +240,13 @@ const wordBot = () => {
       if (ctx.message.text.toLowerCase() == ctx.wizard.state.data) {
         ctx.reply("Correct!");
         if (type == "english") {
-          STT(ctx, ctx.wizard.state.correct);
+          await STT(ctx, ctx.wizard.state.correct);
         }
         i_count = 0;
       } else if (ctx.message.text == "idk" || ctx.message.text == "Idk") {
         ctx.reply(`The correct answer is: ${ctx.wizard.state.data}`);
         if (type == "english") {
-          STT(ctx, ctx.wizard.state.correct);
+          await STT(ctx, ctx.wizard.state.correct);
         }
         i_count = 0;
       } else {
@@ -255,7 +255,7 @@ const wordBot = () => {
             `The correct answer is: ${ctx.wizard.state.data}. No worries! Now type the correct word`
           );
           if (type == "english") {
-            STT(ctx, ctx.wizard.state.correct);
+            await STT(ctx, ctx.wizard.state.correct);
           }
         } else {
           ctx.reply("Incorrect! Try one more time or type 'idk' ");
@@ -282,7 +282,7 @@ const wordBot = () => {
             ctx.callbackQuery.data,
             ctx.wizard.state.correct
           );
-          STT(ctx, ctx.wizard.state.correct);
+          await STT(ctx, ctx.wizard.state.correct);
         }
       } else {
         ctx.reply("Incorrect! Try one more time");
