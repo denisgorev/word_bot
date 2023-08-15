@@ -245,22 +245,24 @@ const wordBot = () => {
         if (type == "english") {
           await STT(ctx, ctx.wizard.state.correct);
         }
-        ctx.reply("Correct!");
+        await ctx.reply("Correct!");
 
         i_count = 0;
       } else if (ctx.message.text == "idk" || ctx.message.text == "Idk") {
-        
         if (type == "english") {
           await STT(ctx, ctx.wizard.state.correct);
         }
-        ctx.reply(`The correct answer is: ${ctx.wizard.state.data}`);
+        await ctx.reply(`The correct answer is: ${ctx.wizard.state.data}`);
         i_count = 0;
       } else {
         if (i_count >= 2) {
           if (type == "english") {
             await STT(ctx, ctx.wizard.state.correct);
+            ctx.replyWithVoice({
+              source: "./audio.wav",
+            });
           }
-          ctx.reply(
+          await ctx.reply(
             `The correct answer is: ${ctx.wizard.state.data}. No worries! Now type the correct word`
           );
         } else {
@@ -268,6 +270,7 @@ const wordBot = () => {
         }
 
         i_count = i_count + 1;
+
         return;
       }
     }
@@ -280,11 +283,10 @@ const wordBot = () => {
         return ctx.scene.leave();
       }
       if (ctx.callbackQuery.data == ctx.wizard.state.data) {
-        
         if (type == "english") {
           await STT(ctx, ctx.wizard.state.correct);
         }
-        ctx.reply("Correct!");
+        await ctx.reply("Correct!");
       } else {
         ctx.reply("Incorrect! Try one more time");
         return;
@@ -764,6 +766,7 @@ const wordBot = () => {
         `What does <b>${text[number][0]}</b> mean?`,
         yesNoKeyboard(responseFinal[0])
       );
+
       return ctx.wizard.next();
     },
 
@@ -777,6 +780,7 @@ const wordBot = () => {
       } catch (err) {
         console.log(err);
       }
+
     },
 
     async (ctx) => {

@@ -6,7 +6,7 @@ const axios = require('axios');
 const app = express();
 const PORT = process.env.PORT || 3000 // Specify the desired port number
 const WAIT_INTERVAL = 840000 //  28 minutes
-const TIMEOUT = 7200000 // 2 hours
+const TIMEOUT = 14400000 // 4? hours
 
 let interval = 0;
 

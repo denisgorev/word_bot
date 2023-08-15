@@ -24,6 +24,7 @@ const STT = async (ctx, text, language = "en") => {
       });
     });
   }
+
 };
 
 exports.STT = STT;
