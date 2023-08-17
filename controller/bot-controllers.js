@@ -677,6 +677,7 @@ const wordBot = () => {
       }
       let number = responseFinal[1];
       ctx.wizard.state.data = text[number][1];
+      ctx.wizard.state.correct = text[number][0];
       ctx.wizard.state.array = [text[number][0], text[number][1]];
       ctx.replyWithHTML(
         `What does <b>${text[number][0]}</b> mean?`,
