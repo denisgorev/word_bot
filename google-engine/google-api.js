@@ -19,7 +19,7 @@ const call = async (type = "words") => {
       readData = await googleSheetsInstance.spreadsheets.values.get({
         auth, //auth object
         spreadsheetId, // spreadsheet id
-        range: "Words!A:B", //range of cells to read from.
+        range: "Words!A:E", //range of cells to read from.
       });
     }
     if (type == "phrases") {
@@ -44,14 +44,12 @@ const call = async (type = "words") => {
   }
 };
 
-const updateGoogle = async (newValue, index) => {
-
+const updateGoogle = async (newValue, index, language, column) => {
   if (index === undefined) {
-    return
+    return;
   }
 
-  
-  index = parseInt(index) + 1
+  index = parseInt(index) + 1;
   // console.log("google api", index)
   try {
     const authClientObject = await auth.getClient();
@@ -59,15 +57,29 @@ const updateGoogle = async (newValue, index) => {
       version: "v4",
       auth: authClientObject,
     });
-
-    await googleSheetsInstance.spreadsheets.values.update({
-      spreadsheetId: "1I275HAkbd8W9bPwwl9kV0pnscdQ_0b38aMoncSjEYuY",
-      valueInputOption: "USER_ENTERED",
-      range: `English!C${index}`,
-      resource: {
-        values: [[newValue]],
-      },
-    });
+    if (language == "en") {
+      await googleSheetsInstance.spreadsheets.values.update({
+        spreadsheetId: "1I275HAkbd8W9bPwwl9kV0pnscdQ_0b38aMoncSjEYuY",
+        valueInputOption: "USER_ENTERED",
+        range: `English!C${index}`,
+        resource: {
+          values: [[newValue]],
+        },
+      });
+    }
+    if (language == "nl") {
+      {
+        console.log("entered relevance change");
+        await googleSheetsInstance.spreadsheets.values.update({
+          spreadsheetId: "1I275HAkbd8W9bPwwl9kV0pnscdQ_0b38aMoncSjEYuY",
+          valueInputOption: "USER_ENTERED",
+          range: `Words!${column}${index}`,
+          resource: {
+            values: [[newValue]],
+          },
+        });
+      }
+    }
   } catch (err) {
     console.log(err);
   }

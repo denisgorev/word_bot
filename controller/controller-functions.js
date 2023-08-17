@@ -1,6 +1,6 @@
 const { updateGoogle } = require("../google-engine/google-api");
 
-const getRandomWord = (wordList) => {
+const getRandomWord = (wordList, language = 'en', column) => {
   wordList = wordList.filter(([phrase, meaning, relevance, number]) => relevance);
 
   // console.log( wordList.slice(0))
@@ -19,14 +19,15 @@ const getRandomWord = (wordList) => {
     cumulativeWeight += Number(wordList[i][2]);
     if (randomValue <= cumulativeWeight) {
       // Return the chosen combination along with its index in an object
-
+      
       let newRelevance = wordList[i][2] - 5;
       let num = wordList[i][3]
       if (newRelevance < 5) {
         newRelevance = 5;
       }
+
       // Return the chosen combination along with its index in an object
-      updateGoogle(newRelevance, num);
+      updateGoogle(newRelevance, num, language, column);
 
       
 

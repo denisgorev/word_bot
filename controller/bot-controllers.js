@@ -35,7 +35,12 @@ const numberGen = (length, outputText) => {
   return outputText[number_new];
 };
 
-const messageComposeType = async (minus = [], reg = true, type = "words") => {
+const messageComposeType = async (
+  ctx,
+  minus = [],
+  reg = true,
+  type = "words"
+) => {
   let response;
 
   try {
@@ -50,6 +55,31 @@ const messageComposeType = async (minus = [], reg = true, type = "words") => {
     // Print the resulting wordList
     const randomWord = getRandomWord(text);
     number = randomWord.index;
+  } else if (type == "words") {
+    // "306807986" "Nastya"
+    //275498236 Denis
+    if (ctx.from.id == "275498236") {
+      text = text.map(([first, second, , fourth, fifth]) => [
+        first,
+        second,
+        fourth,
+        fifth,
+      ]);
+
+      const randomWord = getRandomWord(text, "nl", "D");
+      number = randomWord.index;
+    }
+    if (ctx.from.id == "306807986") {
+      text = text.map(([first, second, third, , fifth]) => [
+        first,
+        second,
+        third,
+        fifth,
+      ]);
+
+      const randomWord = getRandomWord(text, "nl", "C");
+      number = randomWord.index;
+    }
   } else {
     let length = text.length - 1;
     number = getRandomInt(1, length);
@@ -62,7 +92,7 @@ const byteSize = (str) => {
   return Buffer.byteLength(str, "utf8");
 };
 
-const messageCompose = async (minus = [], reg = true, type = "words") => {
+const messageCompose = async (ctx, minus = [], reg = true, type = "words") => {
   let response;
   let number;
   const arrayButtons = [];
@@ -76,11 +106,33 @@ const messageCompose = async (minus = [], reg = true, type = "words") => {
   }
 
   if (type == "english") {
-    // const header = text.shift();
-
-    // Print the resulting wordList
     const randomWord = getRandomWord(text);
     number = randomWord.index;
+  } else if (type == "words") {
+    // "306807986" "Nastya"
+    //275498236 Denis
+    if (ctx.from.id == "275498236") {
+      text = text.map(([first, second, , fourth, fifth]) => [
+        first,
+        second,
+        fourth,
+        fifth,
+      ]);
+
+      const randomWord = getRandomWord(text, "nl", "D");
+      number = randomWord.index;
+    }
+    if (ctx.from.id == "306807986") {
+      text = text.map(([first, second, third, , fifth]) => [
+        first,
+        second,
+        third,
+        fifth,
+      ]);
+
+      const randomWord = getRandomWord(text, "nl", "C");
+      number = randomWord.index;
+    }
   } else {
     let length = text.length - 1;
     number = getRandomInt(1, length);
@@ -244,6 +296,8 @@ const wordBot = () => {
       if (ctx.message.text.toLowerCase() == ctx.wizard.state.data) {
         if (type == "english") {
           await STT(ctx, ctx.wizard.state.correct);
+        } else {
+          await STT(ctx, ctx.wizard.state.correct, "nl");
         }
         await ctx.reply("Correct!");
 
@@ -251,6 +305,8 @@ const wordBot = () => {
       } else if (ctx.message.text == "idk" || ctx.message.text == "Idk") {
         if (type == "english") {
           await STT(ctx, ctx.wizard.state.correct);
+        } else {
+          await STT(ctx, ctx.wizard.state.correct, "nl");
         }
         await ctx.reply(`The correct answer is: ${ctx.wizard.state.data}`);
         i_count = 0;
@@ -258,9 +314,8 @@ const wordBot = () => {
         if (i_count >= 2) {
           if (type == "english") {
             await STT(ctx, ctx.wizard.state.correct);
-            ctx.replyWithVoice({
-              source: "./audio.wav",
-            });
+          } else {
+            await STT(ctx, ctx.wizard.state.correct, "nl");
           }
           await ctx.reply(
             `The correct answer is: ${ctx.wizard.state.data}. No worries! Now type the correct word`
@@ -285,6 +340,8 @@ const wordBot = () => {
       if (ctx.callbackQuery.data == ctx.wizard.state.data) {
         if (type == "english") {
           await STT(ctx, ctx.wizard.state.correct);
+        } else {
+          await STT(ctx, ctx.wizard.state.correct, "nl");
         }
         await ctx.reply("Correct!");
       } else {
@@ -297,14 +354,19 @@ const wordBot = () => {
     let responseFinal;
     if (modeType == "direct") {
       try {
-        responseFinal = await messageCompose(newArray, true, type);
+        responseFinal = await messageCompose(ctx, newArray, true, type);
       } catch (err) {
         console.log(err);
       }
     }
     if (modeType == "reversed") {
       try {
-        responseFinal = await messageCompose(newArray, (reg = false), type);
+        responseFinal = await messageCompose(
+          ctx,
+          newArray,
+          (reg = false),
+          type
+        );
       } catch (err) {
         console.log(err);
       }
@@ -312,7 +374,12 @@ const wordBot = () => {
 
     if (modeType == "typing") {
       try {
-        responseFinal = await messageComposeType(newArray, (reg = false), type);
+        responseFinal = await messageComposeType(
+          ctx,
+          newArray,
+          (reg = false),
+          type
+        );
       } catch (err) {
         console.log(err);
       }
@@ -337,7 +404,6 @@ const wordBot = () => {
       }
       ctx.wizard.state.data = text[number][1];
       ctx.wizard.state.correct = text[number][0];
-      console.log(ctx.wizard.state.correct);
       ctx.wizard.state.array = newArray.concat([
         text[number][0],
         text[number][1],
@@ -387,12 +453,13 @@ const wordBot = () => {
     async (ctx) => {
       let responseFinal;
       try {
-        responseFinal = await messageCompose();
+        responseFinal = await messageCompose(ctx);
       } catch (err) {
         console.log(err);
       }
       let number = responseFinal[1];
       ctx.wizard.state.data = text[number][1];
+      ctx.wizard.state.correct = text[number][0];
       ctx.wizard.state.array = [text[number][0], text[number][1]];
       ctx.replyWithHTML(
         `What does <b>${text[number][0]}</b> mean?`,
@@ -604,7 +671,7 @@ const wordBot = () => {
     async (ctx) => {
       let responseFinal;
       try {
-        responseFinal = await messageCompose([], true, "phrases");
+        responseFinal = await messageCompose(ctx, [], true, "phrases");
       } catch (err) {
         console.log(err);
       }
@@ -750,7 +817,7 @@ const wordBot = () => {
     async (ctx) => {
       let responseFinal;
       try {
-        responseFinal = await messageCompose([], true, "english");
+        responseFinal = await messageCompose(ctx, [], true, "english");
       } catch (err) {
         console.log(err);
       }
@@ -780,7 +847,6 @@ const wordBot = () => {
       } catch (err) {
         console.log(err);
       }
-
     },
 
     async (ctx) => {
