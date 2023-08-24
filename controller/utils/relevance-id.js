@@ -1,4 +1,4 @@
-const { updateGoogle } = require("../google-engine/google-api");
+const { updateGoogle } = require("../../google-engine/google-api");
 
 const getRandomWord = (wordList, language = 'en', column) => {
   wordList = wordList.filter(([phrase, meaning, relevance, number]) => relevance);
