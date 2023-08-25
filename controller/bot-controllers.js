@@ -9,6 +9,7 @@ const {
   messageCompose,
 } = require("./utils/general-functions");
 const { chatGPT } = require("./utils/chat-gpt");
+const studyPhrasesWizard = require("./scenes/study-phrase");
 
 const bot = new Telegraf(process.env.TOKEN);
 
@@ -46,40 +47,8 @@ const wordBot = () => {
     ctx.replyWithHTML(text.join("").toString());
   });
 
-  const studyPhrasesWizard = new Scenes.WizardScene(
-    "phrase_training",
-    async (ctx) => {
-      ctx.replyWithHTML("Welcome to the sentences composing mode");
 
-      try {
-        responseFinal = await messageCompose(ctx, [], true, "english");
-      } catch (err) {
-        console.log(err);
-      }
-      const index = responseFinal[1];
-      const shownWord = responseFinal[2][index][0];
-
-      ctx.replyWithHTML(
-        `Please compose a sentence with the following word: <b>${shownWord}</b>`
-      );
-
-      return ctx.wizard.next();
-      
-    },
-    async (ctx) => {
-
-      const userInput = ctx.message.text 
-      const chatGPTResponse = await chatGPT(userInput)
-      console.log(chatGPTResponse)
-      await ctx.replyWithHTML(
-        chatGPTResponse
-      );
-      console.log(userInput);
-      
-      
-      return ctx.scene.leave();
-    }
-  );
+  
   const stage = new Scenes.Stage([
     wordsDataWizard,
     wordsPhrasesWizard,
