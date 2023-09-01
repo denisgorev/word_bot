@@ -4,6 +4,7 @@ const { getRandomWord } = require("./relevance-id");
 const { STT } = require("./speech-to-text");
 
 const wordBotInteraction = async (ctx, type = "words", modeType = "direct") => {
+    let i_count = 0;
   if (ctx.callbackQuery === undefined && ctx.message.text === undefined) {
     ctx.reply(`You should select an option`);
     return;
@@ -34,8 +35,9 @@ const wordBotInteraction = async (ctx, type = "words", modeType = "direct") => {
       } else {
         await STT(ctx, ctx.wizard.state.correct, "nl");
       }
-      await ctx.reply(`The correct answer is: ${ctx.wizard.state.data}`);
+      await ctx.reply(`The correct answer is: ${ctx.wizard.state.data}. Now type or select the correct word`);
       i_count = 0;
+      return
     } else {
       if (i_count >= 2) {
         if (type == "english") {
@@ -46,6 +48,7 @@ const wordBotInteraction = async (ctx, type = "words", modeType = "direct") => {
         await ctx.reply(
           `The correct answer is: ${ctx.wizard.state.data}. No worries! Now type the correct word`
         );
+        
       } else {
         ctx.reply("Incorrect! Try one more time or type 'idk' ");
       }

@@ -2,6 +2,9 @@ const { Scenes } = require("telegraf");
 const { chatGPT } = require("../utils/chat-gpt");
 const { messageCompose } = require("../utils/general-functions");
 
+
+//// !!!No memory of already selected words implemented!!!
+
 const stepCount = 5; // Total number of steps
 
 const createStep = async (ctx, repeatWelcome) => {

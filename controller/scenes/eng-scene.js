@@ -10,6 +10,7 @@ const engMode = new Scenes.WizardScene(
   async (ctx) => {
     let responseFinal;
     try {
+      console.log('direct')
       responseFinal = await messageCompose(ctx, [], true, "english");
     } catch (err) {
       console.log(err);
