@@ -69,7 +69,7 @@ const updateGoogle = async (newValue, index, language, column) => {
     }
     if (language == "nl") {
       {
-        console.log("entered relevance change");
+        // console.log("entered relevance change");
         await googleSheetsInstance.spreadsheets.values.update({
           spreadsheetId: "1I275HAkbd8W9bPwwl9kV0pnscdQ_0b38aMoncSjEYuY",
           valueInputOption: "USER_ENTERED",

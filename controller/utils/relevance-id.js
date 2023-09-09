@@ -1,7 +1,16 @@
 const { updateGoogle } = require("../../google-engine/google-api");
 
+
 const getRandomWord = (wordList, language = 'en', column) => {
-  wordList = wordList.filter(([phrase, meaning, relevance, number]) => relevance);
+  // wordList = wordList.filter(([phrase, meaning, relevance, number]) => relevance);
+
+  wordList = wordList.map(([phrase, meaning, relevance, number]) => [
+    phrase.trim().toLowerCase(),
+    meaning || 'missing value',
+    relevance || '50',
+    number
+  ]);
+
 
   // console.log( wordList.slice(0))
   // Calculate the sum of all relevance weights
@@ -18,10 +27,12 @@ const getRandomWord = (wordList, language = 'en', column) => {
     // Accessing word relevance using index [2]
     cumulativeWeight += Number(wordList[i][2]);
     if (randomValue <= cumulativeWeight) {
+       
       // Return the chosen combination along with its index in an object
       
       let newRelevance = wordList[i][2] - 5;
       let num = wordList[i][3]
+
       if (newRelevance < 5) {
         newRelevance = 5;
       }

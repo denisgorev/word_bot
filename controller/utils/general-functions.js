@@ -20,7 +20,7 @@ const wordBotInteraction = async (ctx, type = "words", modeType = "direct") => {
       return ctx.scene.leave();
     }
 
-    if (ctx.message.text.toLowerCase() == ctx.wizard.state.data) {
+    if (ctx.message.text.trim().toLowerCase() == ctx.wizard.state.data.trim().toLowerCase()) {
       if (type == "english") {
         await STT(ctx, ctx.wizard.state.correct);
       } else {
