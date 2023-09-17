@@ -1,10 +1,11 @@
 const { call } = require("../../google-engine/google-api");
 const { yesNoKeyboard } = require("../../utils/keyboards");
+const { chatGPT } = require("./chat-gpt");
 const { getRandomWord } = require("./relevance-id");
 const { STT } = require("./speech-to-text");
 
 const wordBotInteraction = async (ctx, type = "words", modeType = "direct") => {
-    let i_count = 0;
+  let i_count = 0;
   if (ctx.callbackQuery === undefined && ctx.message.text === undefined) {
     ctx.reply(`You should select an option`);
     return;
@@ -20,13 +21,32 @@ const wordBotInteraction = async (ctx, type = "words", modeType = "direct") => {
       return ctx.scene.leave();
     }
 
-    if (ctx.message.text.trim().toLowerCase() == ctx.wizard.state.data.trim().toLowerCase()) {
+    if (ctx.wizard.state.gpt == true) {
+      console.log(true, ctx.message.text);
+      const userInput = ctx.message.text;
+      console.log(userInput);
+      const chatGPTResponse = await chatGPT(userInput);
+      await ctx.replyWithHTML(chatGPTResponse);
+      
+    }
+
+    if (
+      ctx.message.text.trim().toLowerCase() ==
+      ctx.wizard.state.data.trim().toLowerCase() || ctx.wizard.state.gpt == true
+    ) {
       if (type == "english") {
         await STT(ctx, ctx.wizard.state.correct);
       } else {
         await STT(ctx, ctx.wizard.state.correct, "nl");
       }
-      await ctx.reply("Correct!");
+      if (ctx.wizard.state.gpt == true) {
+        await ctx.reply(ctx.wizard.state.data);
+        await ctx.reply(ctx.wizard.state.translate);  
+        
+      } else {
+        await ctx.reply("Correct!");
+      }
+      
 
       i_count = 0;
     } else if (ctx.message.text == "idk" || ctx.message.text == "Idk") {
@@ -35,9 +55,11 @@ const wordBotInteraction = async (ctx, type = "words", modeType = "direct") => {
       } else {
         await STT(ctx, ctx.wizard.state.correct, "nl");
       }
-      await ctx.reply(`The correct answer is: ${ctx.wizard.state.data}. Now type or select the correct word`);
+      await ctx.reply(
+        `The correct answer is: ${ctx.wizard.state.data}. Now type or select the correct word`
+      );
       i_count = 0;
-      return
+      return;
     } else {
       if (i_count >= 2) {
         if (type == "english") {
@@ -48,7 +70,6 @@ const wordBotInteraction = async (ctx, type = "words", modeType = "direct") => {
         await ctx.reply(
           `The correct answer is: ${ctx.wizard.state.data}. No worries! Now type the correct word`
         );
-        
       } else {
         ctx.reply("Incorrect! Try one more time or type 'idk' ");
       }
@@ -109,6 +130,20 @@ const wordBotInteraction = async (ctx, type = "words", modeType = "direct") => {
     }
   }
 
+  if (modeType == "gpt_phrases") {
+    console.log("gpt_phrases first");
+    try {
+      responseFinal = await messageComposeGPT(
+        ctx,
+        newArray,
+        (reg = false),
+        type
+      );
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   if (responseFinal == undefined) {
     ctx.reply(
       `Very good! There are no more words in the list, so you left the learning mode`
@@ -118,7 +153,7 @@ const wordBotInteraction = async (ctx, type = "words", modeType = "direct") => {
 
   let number = responseFinal[1];
 
-  if (modeType == "typing") {
+  if (modeType == "typing" || modeType == "gpt_phrases") {
     number = responseFinal[0];
   }
   if (modeType == "direct") {
@@ -126,8 +161,10 @@ const wordBotInteraction = async (ctx, type = "words", modeType = "direct") => {
       ctx.reply(`There are no more questions. You left the learning mode`);
       return ctx.scene.leave();
     }
+    console.log(text[number]);
     ctx.wizard.state.data = text[number][1];
     ctx.wizard.state.correct = text[number][0];
+    ctx.wizard.state.gpt = false;
     ctx.wizard.state.array = newArray.concat([
       text[number][0],
       text[number][1],
@@ -142,8 +179,10 @@ const wordBotInteraction = async (ctx, type = "words", modeType = "direct") => {
       ctx.reply(`There are no more questions. You left the learning mode`);
       return ctx.scene.leave();
     }
+    console.log(text[number]);
     ctx.wizard.state.data = text[number][0];
     ctx.wizard.state.correct = text[number][0];
+    ctx.wizard.state.gpt = false;
     ctx.wizard.state.array = newArray.concat([
       text[number][0],
       text[number][1],
@@ -160,11 +199,37 @@ const wordBotInteraction = async (ctx, type = "words", modeType = "direct") => {
     }
     ctx.wizard.state.data = text[number][0];
     ctx.wizard.state.correct = text[number][0];
+
+    ctx.wizard.state.gpt = false;
     ctx.wizard.state.array = newArray.concat([
       text[number][0],
       text[number][1],
     ]);
     ctx.replyWithHTML(`What does <b>${text[number][1]}</b> mean? Please type`);
+  }
+
+  if (modeType == "gpt_phrases") {
+
+    console.log(text[number]);
+    console.log(number);
+
+    if (text[number] == undefined) {
+      ctx.reply(`There are no more questions. You left the learning mode`);
+      return ctx.scene.leave();
+    }
+
+
+    ctx.replyWithHTML(
+      `Chat GPT mode! Please compose a sentence with the following word: <b>${text[number][0]}</b>. Chat GPT will check it, but it could take some time`
+    );
+    ctx.wizard.state.data = text[number][0];
+    ctx.wizard.state.translate = text[number][1];
+    ctx.wizard.state.correct = text[number][0];
+    ctx.wizard.state.gpt = true;
+    ctx.wizard.state.array = newArray.concat([
+      text[number][0],
+      text[number][1],
+    ]);
   }
 
   return ctx.wizard.next();
@@ -247,7 +312,7 @@ const messageCompose = async (ctx, minus = [], reg = true, type = "words") => {
   let preFinalText = text[number];
 
   let finalText = preFinalText.map((word) => word.toLowerCase().trim());
-//   let correctWord = finalText
+  //   let correctWord = finalText
 
   //generation of 4 wrong answers
   for (let i = 1; i < 4; i++) {
@@ -275,6 +340,33 @@ const messageCompose = async (ctx, minus = [], reg = true, type = "words") => {
   }
   let arrayButtonsFinal = shuffleArray(arrayButtons);
   return [arrayButtonsFinal, number, text];
+};
+
+const messageComposeGPT = async (
+  ctx,
+  minus = [],
+  reg = true,
+  type = "words"
+) => {
+  try {
+    console.log("chat gpt second");
+    response = await allWordsCallArray("array", type);
+    text = subtractArrays(response, minus);
+  } catch (err) {
+    console.log(err);
+    process.exit(1);
+  }
+
+  if (type === "english") {
+    // Print the resulting wordList
+    const randomWord = getRandomWord(text);
+    number = randomWord.index;
+    console.log("chat gpt third");
+    console.log(number);
+  } else {
+    return;
+  }
+  return [number, text];
 };
 
 const messageComposeType = async (
@@ -400,5 +492,5 @@ module.exports = {
   messageCompose,
   messageComposeType,
   wordBotInteraction,
-  allWordsCallArray
+  allWordsCallArray,
 };

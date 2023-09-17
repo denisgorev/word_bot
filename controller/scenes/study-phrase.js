@@ -8,6 +8,7 @@ const { messageCompose } = require("../utils/general-functions");
 const stepCount = 5; // Total number of steps
 
 const createStep = async (ctx, repeatWelcome) => {
+
   if (repeatWelcome) {
     ctx.replyWithHTML("Welcome to the sentences composing mode. Please note that ChatGPT will review your answers and it takes some time for it to prepare the response.");
   }
@@ -19,6 +20,11 @@ const createStep = async (ctx, repeatWelcome) => {
   }
   const index = responseFinal[1];
   const shownWord = responseFinal[2][index][0];
+
+
+//   ctx.wizard.state.data = text[number][1];
+//   ctx.wizard.state.correct = text[number][0];
+
 
   ctx.replyWithHTML(
     `Please compose a sentence with the following word: <b>${shownWord}</b>`

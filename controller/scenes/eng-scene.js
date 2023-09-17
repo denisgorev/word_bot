@@ -10,7 +10,6 @@ const engMode = new Scenes.WizardScene(
   async (ctx) => {
     let responseFinal;
     try {
-      console.log('direct')
       responseFinal = await messageCompose(ctx, [], true, "english");
     } catch (err) {
       console.log(err);
@@ -20,6 +19,7 @@ const engMode = new Scenes.WizardScene(
       return ctx.scene.leave();
     }
     let number = responseFinal[1];
+    console.log(text[number], number)
     ctx.wizard.state.data = text[number][1];
     ctx.wizard.state.correct = text[number][0];
     ctx.wizard.state.array = [text[number][0], text[number][1]];
@@ -41,6 +41,14 @@ const engMode = new Scenes.WizardScene(
 
   async (ctx) => {
     try {
+      await wordBotInteraction(ctx, (type = "english"), (modeType = "gpt_phrases"));
+    } catch (err) {
+      console.log(err);
+    }
+  },
+
+  async (ctx) => {
+    try {
       await wordBotInteraction(ctx, (type = "english"));
     } catch (err) {
       console.log(err);
@@ -58,6 +66,14 @@ const engMode = new Scenes.WizardScene(
   async (ctx) => {
     try {
       await wordBotInteraction(ctx, (type = "english"));
+    } catch (err) {
+      console.log(err);
+    }
+  },
+
+  async (ctx) => {
+    try {
+      await wordBotInteraction(ctx, (type = "english"), (modeType = "gpt_phrases"));
     } catch (err) {
       console.log(err);
     }
@@ -101,6 +117,14 @@ const engMode = new Scenes.WizardScene(
 
   async (ctx) => {
     try {
+      await wordBotInteraction(ctx, (type = "english"), (modeType = "gpt_phrases"));
+    } catch (err) {
+      console.log(err);
+    }
+  },
+
+  async (ctx) => {
+    try {
       await wordBotInteraction(ctx, (type = "english"), (modeType = "typing"));
     } catch (err) {
       console.log(err);
@@ -173,6 +197,14 @@ const engMode = new Scenes.WizardScene(
 
   async (ctx) => {
     try {
+      await wordBotInteraction(ctx, (type = "english"), (modeType = "gpt_phrases"));
+    } catch (err) {
+      console.log(err);
+    }
+  },
+
+  async (ctx) => {
+    try {
       await wordBotInteraction(ctx, (type = "english"), (modeType = "typing"));
     } catch (err) {
       console.log(err);
@@ -186,6 +218,22 @@ const engMode = new Scenes.WizardScene(
         (type = "english"),
         (modeType = "reversed")
       );
+    } catch (err) {
+      console.log(err);
+    }
+  },
+
+  async (ctx) => {
+    try {
+      await wordBotInteraction(ctx, (type = "english"), (modeType = "gpt_phrases"));
+    } catch (err) {
+      console.log(err);
+    }
+  },
+
+  async (ctx) => {
+    try {
+      await wordBotInteraction(ctx, (type = "english"));
     } catch (err) {
       console.log(err);
     }
